@@ -26,3 +26,36 @@ func removeContents(path string) {
 
 	fmt.Printf("cleaned %s\n", path)
 }
+
+func dirSize(path string) (int64, bool) {
+	if _, err := os.Stat(path); err != nil {
+		return 0, false
+	}
+
+	var total int64
+	filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() {
+			total += info.Size()
+		}
+		return nil
+	})
+
+	return total, true
+}
+
+func sizeOfPaths(paths ...string) (int64, bool) {
+	var total int64
+	found := false
+
+	for _, path := range paths {
+		if size, ok := dirSize(path); ok {
+			total += size
+			found = true
+		}
+	}
+
+	return total, found
+}
