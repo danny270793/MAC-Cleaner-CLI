@@ -11,7 +11,8 @@ func main() {
 	}
 
 	for _, cleaner := range all {
-		printPending(cleaner.Name())
+		size, measurable := cleaner.Size()
+		printPending(cleaner.Name(), size, measurable)
 		cleaner.Clean()
 		printDone(cleaner.Name())
 	}
