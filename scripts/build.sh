@@ -1,3 +1,3 @@
 set -e
 
-go build -o ./build ./code
+go build -o ./build/maccleaner ./code
