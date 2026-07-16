@@ -11,6 +11,8 @@ func main() {
 	}
 
 	for _, cleaner := range all {
+		printPending(cleaner.Name())
 		cleaner.Clean()
+		printDone(cleaner.Name())
 	}
 }
