@@ -1,3 +1,3 @@
 set -e
 
-go run ./code
+go run ./code "$@"
