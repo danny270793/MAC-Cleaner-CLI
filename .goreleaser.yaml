@@ -1,0 +1,30 @@
+version: 2
+
+project_name: maccleaner
+
+builds:
+  - id: maccleaner
+    dir: .
+    main: ./code
+    binary: maccleaner
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  - id: maccleaner
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  disable: true
+
+release:
+  mode: keep-existing
