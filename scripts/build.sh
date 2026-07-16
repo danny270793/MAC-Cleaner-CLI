@@ -1,3 +1,3 @@
 set -e
 
-go build -o ./build
+go build -o ./build ./code
