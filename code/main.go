@@ -8,6 +8,18 @@ import (
 )
 
 func main() {
+	flag.Usage = func() {
+		output := flag.CommandLine.Output()
+		fmt.Fprintln(output, "mac-cleaner - free up disk space by clearing caches you don't need")
+		fmt.Fprintln(output, "\nUsage:")
+		fmt.Fprintln(output, "  maccleaner [flags]")
+		fmt.Fprintln(output, "\nFlags:")
+		flag.PrintDefaults()
+		fmt.Fprintln(output, "\nExamples:")
+		fmt.Fprintln(output, "  maccleaner --all")
+		fmt.Fprintln(output, "  maccleaner --docker --gradle")
+	}
+
 	showVersion := flag.Bool("version", false, "print the version and exit")
 	all := flag.Bool("all", false, "run every cleaner")
 	docker := flag.Bool("docker", false, "clean docker")
