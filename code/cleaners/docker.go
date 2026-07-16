@@ -12,6 +12,10 @@ func (Docker) Name() string {
 	return "docker"
 }
 
+func (Docker) Size() (int64, bool) {
+	return 0, false
+}
+
 func (Docker) Clean() {
 	if _, err := exec.LookPath("docker"); err != nil {
 		fmt.Println("docker not installed (nothing to clean)")
