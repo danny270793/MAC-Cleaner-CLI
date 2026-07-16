@@ -8,6 +8,10 @@ import (
 
 type Docker struct{}
 
+func (Docker) Name() string {
+	return "docker"
+}
+
 func (Docker) Clean() {
 	if _, err := exec.LookPath("docker"); err != nil {
 		fmt.Println("docker not installed (nothing to clean)")
