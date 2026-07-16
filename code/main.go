@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	showVersion := flag.Bool("version", false, "print the version and exit")
 	all := flag.Bool("all", false, "run every cleaner")
 	docker := flag.Bool("docker", false, "clean docker")
 	gradle := flag.Bool("gradle", false, "clean gradle caches")
@@ -15,6 +16,11 @@ func main() {
 	pubCache := flag.Bool("pub-cache", false, "clean ~/.pub-cache")
 	vscodeExtensions := flag.Bool("vscode-extensions", false, "remove outdated versions of ~/.vscode/extensions")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		return
+	}
 
 	var selected []Cleaner
 	if *all {
