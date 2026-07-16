@@ -1,14 +1,16 @@
 package main
 
+import "danny270793/maccleaner/code/cleaners"
+
 func main() {
-	cleaners := []Cleaner{
-		Gradle{},
-		LibraryCaches{},
-		PubCache{},
-		Docker{},
+	all := []Cleaner{
+		cleaners.Gradle{},
+		cleaners.LibraryCaches{},
+		cleaners.PubCache{},
+		cleaners.Docker{},
 	}
 
-	for _, cleaner := range cleaners {
+	for _, cleaner := range all {
 		cleaner.Clean()
 	}
 }
