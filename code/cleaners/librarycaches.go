@@ -8,6 +8,10 @@ import (
 
 type LibraryCaches struct{}
 
+func (LibraryCaches) Name() string {
+	return "library caches"
+}
+
 func (LibraryCaches) Clean() {
 	home, err := os.UserHomeDir()
 	if err != nil {
