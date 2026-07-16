@@ -1,1 +1,83 @@
-# MAC Cleaner CLI
+# 🧹 MAC Cleaner CLI
+
+A small, fast command-line tool that frees up disk space on macOS by clearing caches you don't need — Gradle, `~/Library/Caches`, `~/.pub-cache`, outdated VS Code extension versions, and Docker.
+
+> **macOS only.** This tool targets macOS-specific paths (`~/Library/Caches`) and behavior, and is not intended to run on Linux or Windows.
+
+[![CI](https://github.com/danny270793/MAC-Cleaner-CLI/actions/workflows/ci.yml/badge.svg)](https://github.com/danny270793/MAC-Cleaner-CLI/actions/workflows/ci.yml)
+
+## Why
+
+Development tools quietly pile up gigabytes of caches over time: old Gradle downloads, stale VS Code extension versions, dangling Docker images. `maccleaner` clears them out, one flag at a time, and tells you how much space each step will free before it runs.
+
+## Install
+
+Requires Go, managed via [asdf](https://asdf-vm.com/) — see [docs/asdf.md](docs/asdf.md) for setup.
+
+```sh
+git clone git@github.com:danny270793/MAC-Cleaner-CLI.git
+cd MAC-Cleaner-CLI
+asdf install
+```
+
+## Usage
+
+Run without building, straight from source:
+
+```sh
+./scripts/start.sh --all
+```
+
+Or build a binary first:
+
+```sh
+./scripts/build.sh
+./build/maccleaner --all
+```
+
+### Flags
+
+| Flag                 | Description                                          |
+| -------------------- | ----------------------------------------------------- |
+| `--all`               | Run every cleaner                                     |
+| `--docker`            | Run `docker system prune`                             |
+| `--gradle`            | Clear `~/.gradle/caches` and `~/.gradle/wrapper/dists` |
+| `--library-caches`    | Clear the contents of `~/Library/Caches`               |
+| `--pub-cache`         | Clear the contents of `~/.pub-cache`                   |
+| `--vscode-extensions` | Remove outdated versions of installed VS Code extensions, keeping the latest |
+| `--version`           | Print the version and exit                             |
+| `--help`              | Show usage and exit                                    |
+
+At least one flag is required — running with none prints usage instead of doing nothing silently.
+
+### Example
+
+```
+$ ./build/maccleaner --gradle --docker
+[ ] cleaning gradle (1.2GB)
+cleaned /Users/you/.gradle/caches
+cleaned /Users/you/.gradle/wrapper/dists
+[x] cleaned gradle
+
+[ ] cleaning docker
+WARNING! This will remove:
+  - all stopped containers
+  - all networks not used by at least one container
+  - all dangling images
+  - unused build cache
+
+Are you sure you want to continue? [y/N] y
+[x] cleaned docker
+```
+
+Cleaners that clear a cache folder (Gradle, Library Caches, Pub Cache) remove the folder's *contents* only — the folder itself is left in place. Docker's reclaimable space can't be measured up front, so no estimate is shown for it.
+
+## Development
+
+```sh
+./scripts/build.sh   # build the binary into ./build
+./scripts/start.sh   # run from source, arguments are passed through
+./scripts/test.sh    # run the test suite
+```
+
+See [AGENTS.md](AGENTS.md) for contribution conventions (Conventional Commits, branch naming, etc.) — the single source of truth for both human and AI contributors.
