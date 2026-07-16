@@ -8,6 +8,10 @@ import (
 
 type Gradle struct{}
 
+func (Gradle) Name() string {
+	return "gradle"
+}
+
 func (Gradle) Clean() {
 	home, err := os.UserHomeDir()
 	if err != nil {
