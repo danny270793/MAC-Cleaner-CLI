@@ -8,6 +8,10 @@ import (
 
 type PubCache struct{}
 
+func (PubCache) Name() string {
+	return "pub cache"
+}
+
 func (PubCache) Clean() {
 	home, err := os.UserHomeDir()
 	if err != nil {
