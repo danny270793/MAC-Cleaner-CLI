@@ -13,11 +13,12 @@ func main() {
 	gradle := flag.Bool("gradle", false, "clean gradle caches")
 	libraryCaches := flag.Bool("library-caches", false, "clean ~/Library/Caches")
 	pubCache := flag.Bool("pub-cache", false, "clean ~/.pub-cache")
+	vscodeExtensions := flag.Bool("vscode-extensions", false, "remove outdated versions of ~/.vscode/extensions")
 	flag.Parse()
 
 	var selected []Cleaner
 	if *all {
-		selected = []Cleaner{cleaners.Gradle{}, cleaners.LibraryCaches{}, cleaners.PubCache{}, cleaners.Docker{}}
+		selected = []Cleaner{cleaners.Gradle{}, cleaners.LibraryCaches{}, cleaners.PubCache{}, cleaners.VSCodeExtensions{}, cleaners.Docker{}}
 	} else {
 		if *gradle {
 			selected = append(selected, cleaners.Gradle{})
@@ -28,13 +29,16 @@ func main() {
 		if *pubCache {
 			selected = append(selected, cleaners.PubCache{})
 		}
+		if *vscodeExtensions {
+			selected = append(selected, cleaners.VSCodeExtensions{})
+		}
 		if *docker {
 			selected = append(selected, cleaners.Docker{})
 		}
 	}
 
 	if len(selected) == 0 {
-		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache")
+		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache --vscode-extensions")
 		flag.Usage()
 		return
 	}
