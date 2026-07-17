@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.1.0...v0.2.0) (2026-07-17)
+
+
+### Features
+
+* **install:** add install.sh to download and install the latest release ([416035f](https://github.com/danny270793/MAC-Cleaner-CLI/commit/416035fb170645ef65a39b5d0d8e81de6b120092))
+
 ## [0.1.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.0.1...v0.1.0) (2026-07-16)
 
 
