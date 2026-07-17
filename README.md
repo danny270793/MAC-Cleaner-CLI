@@ -12,6 +12,18 @@ Development tools quietly pile up gigabytes of caches over time: old Gradle down
 
 ## Install
 
+### Prebuilt binary
+
+Downloads the latest release for your Mac's architecture and installs it to `~/.local/bin/maccleaner`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/danny270793/MAC-Cleaner-CLI/main/scripts/install.sh | bash
+```
+
+Make sure `~/.local/bin` is on your `PATH` — the script will tell you if it isn't.
+
+### From source
+
 Requires Go, managed via [asdf](https://asdf-vm.com/) — see [docs/asdf.md](docs/asdf.md) for setup.
 
 ```sh
