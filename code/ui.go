@@ -21,6 +21,13 @@ func printDone(name string) {
 	fmt.Printf("%s%s[x] cleaned %s%s\n\n", colorBold, colorGreen, name, colorReset)
 }
 
+func printTotal(total int64, measurable bool) {
+	if !measurable {
+		return
+	}
+	fmt.Printf("%s%s[x] cleaned (%s)%s\n", colorBold, colorGreen, formatBytes(total), colorReset)
+}
+
 func formatBytes(bytes int64) string {
 	const unit = 1024
 	if bytes < unit {
