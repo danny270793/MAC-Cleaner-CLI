@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"os"
 
 	"danny270793/maccleaner/code/cleaners"
 )
@@ -19,6 +21,7 @@ func main() {
 		fmt.Fprintln(output, "  maccleaner --all")
 		fmt.Fprintln(output, "  maccleaner --docker --gradle")
 		fmt.Fprintln(output, "  maccleaner --all --dry-run")
+		fmt.Fprintln(output, "  maccleaner --all --auto-approve")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
@@ -35,6 +38,7 @@ func main() {
 	npmCache := flag.Bool("npm-cache", false, "clean ~/.npm")
 	pnpmStore := flag.Bool("pnpm-store", false, "prune the pnpm store (pnpm store prune)")
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
+	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
 	flag.Parse()
 
 	if *showVersion {
@@ -99,11 +103,19 @@ func main() {
 		return
 	}
 
+	reader := bufio.NewReader(os.Stdin)
+
 	var total int64
 	var totalMeasurable bool
 	for _, cleaner := range selected {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
+
+		if !*autoApprove && !confirm(reader, cleaner.Name()) {
+			printSkipped(cleaner.Name())
+			continue
+		}
+
 		if !*dryRun {
 			cleaner.Clean()
 		}

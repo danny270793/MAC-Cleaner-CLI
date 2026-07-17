@@ -1,12 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"strings"
+)
 
 const (
-	colorReset = "\033[0m"
-	colorCyan  = "\033[36m"
-	colorGreen = "\033[32m"
-	colorBold  = "\033[1m"
+	colorReset  = "\033[0m"
+	colorCyan   = "\033[36m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorBold   = "\033[1m"
 )
 
 func printPending(name string, size int64, measurable bool) {
@@ -26,6 +31,17 @@ func printTotal(total int64, measurable bool) {
 		return
 	}
 	fmt.Printf("%s%s[x] cleaned (%s)%s\n", colorBold, colorGreen, formatBytes(total), colorReset)
+}
+
+func printSkipped(name string) {
+	fmt.Printf("%s%s[ ] skipped %s%s\n\n", colorBold, colorYellow, name, colorReset)
+}
+
+func confirm(reader *bufio.Reader, name string) bool {
+	fmt.Printf("Proceed cleaning %s? [y/N] ", name)
+	input, _ := reader.ReadString('\n')
+	input = strings.ToLower(strings.TrimSpace(input))
+	return input == "y" || input == "yes"
 }
 
 func formatBytes(bytes int64) string {
