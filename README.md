@@ -63,6 +63,7 @@ Or build a binary first:
 | `--cargo-cache`           | Clear `~/.cargo/registry/cache` and `~/.cargo/registry/src`                  |
 | `--npm-cache`             | Clear the contents of `~/.npm`                                               |
 | `--pnpm-store`            | Prune the pnpm store via `pnpm store prune`                                 |
+| `--dry-run`               | Show what would be cleaned (with sizes) without actually cleaning anything  |
 | `--version`               | Print the version and exit                                                   |
 | `--help`                  | Show usage and exit                                                          |
 

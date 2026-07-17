@@ -18,6 +18,7 @@ func main() {
 		fmt.Fprintln(output, "\nExamples:")
 		fmt.Fprintln(output, "  maccleaner --all")
 		fmt.Fprintln(output, "  maccleaner --docker --gradle")
+		fmt.Fprintln(output, "  maccleaner --all --dry-run")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
@@ -33,6 +34,7 @@ func main() {
 	cargoCache := flag.Bool("cargo-cache", false, "clean ~/.cargo/registry/cache and ~/.cargo/registry/src")
 	npmCache := flag.Bool("npm-cache", false, "clean ~/.npm")
 	pnpmStore := flag.Bool("pnpm-store", false, "prune the pnpm store (pnpm store prune)")
+	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	flag.Parse()
 
 	if *showVersion {
@@ -97,10 +99,19 @@ func main() {
 		return
 	}
 
+	var total int64
+	var totalMeasurable bool
 	for _, cleaner := range selected {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
-		cleaner.Clean()
+		if !*dryRun {
+			cleaner.Clean()
+		}
 		printDone(cleaner.Name())
+		if measurable {
+			total += size
+			totalMeasurable = true
+		}
 	}
+	printTotal(total, totalMeasurable)
 }
