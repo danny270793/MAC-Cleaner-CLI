@@ -64,6 +64,7 @@ Or build a binary first:
 | `--npm-cache`             | Clear the contents of `~/.npm`                                               |
 | `--pnpm-store`            | Prune the pnpm store via `pnpm store prune`                                 |
 | `--dry-run`               | Show what would be cleaned (with sizes) without actually cleaning anything  |
+| `--auto-approve`          | Skip the confirmation prompt shown before each cleaner                      |
 | `--version`               | Print the version and exit                                                   |
 | `--help`                  | Show usage and exit                                                          |
 
