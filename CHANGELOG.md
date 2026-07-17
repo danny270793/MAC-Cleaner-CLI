@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.2.0...v0.3.0) (2026-07-17)
+
+
+### Features
+
+* add --auto-approve flag with per-cleaner confirmation prompt ([06e2442](https://github.com/danny270793/MAC-Cleaner-CLI/commit/06e2442683ad088d8dc5a9956c576a95d89bb2b2))
+* **main:** add --auto-approve flag to skip per-cleaner confirmation ([70ce353](https://github.com/danny270793/MAC-Cleaner-CLI/commit/70ce3534052985e79676172dc32493679767d948))
+* **ui:** add confirm prompt and printSkipped helper ([7fcd284](https://github.com/danny270793/MAC-Cleaner-CLI/commit/7fcd284565798c4cf3df0700dbcb71a63d48f8a1))
+
 ## [0.2.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.1.0...v0.2.0) (2026-07-17)
 
 
