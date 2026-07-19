@@ -111,7 +111,7 @@ func main() {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
 
-		if !*autoApprove && !confirm(reader, cleaner.Name()) {
+		if !*dryRun && !*autoApprove && !confirm(reader, cleaner.Name()) {
 			printSkipped(cleaner.Name())
 			continue
 		}
