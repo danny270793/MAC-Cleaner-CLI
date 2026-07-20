@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.3.0...v0.3.1) (2026-07-20)
+
+
+### Bug Fixes
+
+* **main:** skip confirmation prompt on --dry-run ([183e326](https://github.com/danny270793/MAC-Cleaner-CLI/commit/183e326aa612acc4492df5608772c9c5bad98d50))
+* **main:** skip confirmation prompt on --dry-run ([63ddd43](https://github.com/danny270793/MAC-Cleaner-CLI/commit/63ddd43c66aebbbf2c2ee656f6c3a4248b29d93d))
+
 ## [0.3.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.2.0...v0.3.0) (2026-07-17)
 
 
