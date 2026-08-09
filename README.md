@@ -1,6 +1,6 @@
 # 🧹 MAC Cleaner CLI
 
-A small, fast command-line tool that frees up disk space on macOS by clearing caches you don't need — Gradle, `~/Library/Caches`, `~/.pub-cache`, outdated VS Code extension versions, Xcode DerivedData, CoreSimulator caches, the Go module cache, Cargo's registry cache, npm's cache, the pnpm store, and Docker.
+A small, fast command-line tool that frees up disk space on macOS by clearing caches you don't need — Gradle, `~/Library/Caches`, `~/.pub-cache`, outdated VS Code extension versions, Xcode DerivedData, CoreSimulator caches, the Go module cache, Cargo's registry cache, npm's cache, the pnpm store, the Maven local repository, and Docker.
 
 > **macOS only.** This tool targets macOS-specific paths (`~/Library/Caches`) and behavior, and is not intended to run on Linux or Windows.
 
@@ -63,6 +63,7 @@ Or build a binary first:
 | `--cargo-cache`           | Clear `~/.cargo/registry/cache` and `~/.cargo/registry/src`                  |
 | `--npm-cache`             | Clear the contents of `~/.npm`                                               |
 | `--pnpm-store`            | Prune the pnpm store via `pnpm store prune`                                 |
+| `--m2-cache`              | Clear the contents of `~/.m2/repository`                                     |
 | `--dry-run`               | Show what would be cleaned (with sizes) without actually cleaning anything  |
 | `--auto-approve`          | Skip the confirmation prompt shown before each cleaner                      |
 | `--version`               | Print the version and exit                                                   |
@@ -90,7 +91,7 @@ Are you sure you want to continue? [y/N] y
 [x] cleaned docker
 ```
 
-Cleaners that clear a cache folder (Gradle, Library Caches, Pub Cache, Xcode DerivedData, CoreSimulator Caches, Cargo Cache, npm Cache) remove the folder's *contents* only — the folder itself is left in place. The Go module cache and pnpm store are cleared via their own tools (`go clean -modcache`, `pnpm store prune`) instead of a raw delete. Docker's reclaimable space can't be measured up front, so no estimate is shown for it.
+Cleaners that clear a cache folder (Gradle, Library Caches, Pub Cache, Xcode DerivedData, CoreSimulator Caches, Cargo Cache, npm Cache, Maven local repository) remove the folder's *contents* only — the folder itself is left in place. The Go module cache and pnpm store are cleared via their own tools (`go clean -modcache`, `pnpm store prune`) instead of a raw delete. Docker's reclaimable space can't be measured up front, so no estimate is shown for it.
 
 ## Development
 
