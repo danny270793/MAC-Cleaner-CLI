@@ -36,6 +36,7 @@ func main() {
 	goModCache := flag.Bool("go-mod-cache", false, "clean the go module cache (go clean -modcache)")
 	cargoCache := flag.Bool("cargo-cache", false, "clean ~/.cargo/registry/cache and ~/.cargo/registry/src")
 	npmCache := flag.Bool("npm-cache", false, "clean ~/.npm")
+	m2Cache := flag.Bool("m2-cache", false, "clean ~/.m2/repository")
 	pnpmStore := flag.Bool("pnpm-store", false, "prune the pnpm store (pnpm store prune)")
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
@@ -59,6 +60,7 @@ func main() {
 			cleaners.CargoCache{},
 			cleaners.NpmCache{},
 			cleaners.PnpmStore{},
+			cleaners.M2Cache{},
 			cleaners.Docker{},
 		}
 	} else {
@@ -92,13 +94,16 @@ func main() {
 		if *pnpmStore {
 			selected = append(selected, cleaners.PnpmStore{})
 		}
+		if *m2Cache {
+			selected = append(selected, cleaners.M2Cache{})
+		}
 		if *docker {
 			selected = append(selected, cleaners.Docker{})
 		}
 	}
 
 	if len(selected) == 0 {
-		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache --vscode-extensions --xcode-derived-data --core-simulator-caches --go-mod-cache --cargo-cache --npm-cache --pnpm-store")
+		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache --vscode-extensions --xcode-derived-data --core-simulator-caches --go-mod-cache --cargo-cache --npm-cache --pnpm-store --m2-cache")
 		flag.Usage()
 		return
 	}
