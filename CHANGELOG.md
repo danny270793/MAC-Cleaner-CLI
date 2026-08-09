@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.3.1...v0.4.0) (2026-08-09)
+
+
+### Features
+
+* **cleaners:** add --m2-cache flag to clean maven local repository ([0075368](https://github.com/danny270793/MAC-Cleaner-CLI/commit/0075368db6ef4c1a4757ddc422dd2d4d9351b47e))
+* **cleaners:** add --m2-cache flag to clean maven local repository ([5683ec8](https://github.com/danny270793/MAC-Cleaner-CLI/commit/5683ec8c612177a93f6758774cdc7b1aab48a68c))
+
 ## [0.3.1](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.3.0...v0.3.1) (2026-07-20)
 
 
