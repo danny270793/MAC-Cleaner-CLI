@@ -30,12 +30,13 @@ func (c CoreSimulatorCaches) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (c CoreSimulatorCaches) Clean() {
+func (c CoreSimulatorCaches) Clean() (int64, bool) {
 	path, err := c.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }

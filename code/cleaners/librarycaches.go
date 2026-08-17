@@ -30,12 +30,13 @@ func (l LibraryCaches) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (l LibraryCaches) Clean() {
+func (l LibraryCaches) Clean() (int64, bool) {
 	path, err := l.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }

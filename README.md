@@ -52,7 +52,7 @@ Or build a binary first:
 | Flag                     | Description                                                                  |
 | ------------------------ | ----------------------------------------------------------------------------- |
 | `--all`                   | Run every cleaner                                                            |
-| `--docker`                | Run `docker system prune`                                                    |
+| `--docker`                | Run `docker system prune --all --volumes --force`                            |
 | `--gradle`                | Clear `~/.gradle/caches` and `~/.gradle/wrapper/dists`                       |
 | `--library-caches`        | Clear the contents of `~/Library/Caches`                                     |
 | `--pub-cache`             | Clear the contents of `~/.pub-cache`                                         |
@@ -80,18 +80,14 @@ cleaned /Users/you/.gradle/caches
 cleaned /Users/you/.gradle/wrapper/dists
 [x] cleaned gradle
 
-[ ] cleaning docker
-WARNING! This will remove:
-  - all stopped containers
-  - all networks not used by at least one container
-  - all dangling images
-  - unused build cache
-
-Are you sure you want to continue? [y/N] y
+[ ] cleaning docker (2.5GB)
+Deleted Containers:
+...
+Total reclaimed space: 2.521GB
 [x] cleaned docker
 ```
 
-Cleaners that clear a cache folder (Gradle, Library Caches, Pub Cache, Xcode DerivedData, CoreSimulator Caches, Cargo Cache, npm Cache, Maven local repository) remove the folder's *contents* only — the folder itself is left in place. The Go module cache and pnpm store are cleared via their own tools (`go clean -modcache`, `pnpm store prune`) instead of a raw delete. Docker's reclaimable space can't be measured up front, so no estimate is shown for it.
+Cleaners that clear a cache folder (Gradle, Library Caches, Pub Cache, Xcode DerivedData, CoreSimulator Caches, Cargo Cache, npm Cache, Maven local repository) remove the folder's *contents* only — the folder itself is left in place. The Go module cache and pnpm store are cleared via their own tools (`go clean -modcache`, `pnpm store prune`) instead of a raw delete. Docker's reclaimable space is estimated up front via `docker system df` (shown in the pending line and under `--dry-run`) and its `system prune` runs with `--all --volumes --force` so it removes all unused images and volumes, not just dangling ones, without its own separate confirmation prompt — the app's own per-cleaner confirmation (skippable with `--auto-approve`) is still shown.
 
 ## Development
 

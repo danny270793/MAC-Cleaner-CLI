@@ -30,12 +30,13 @@ func (p PubCache) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (p PubCache) Clean() {
+func (p PubCache) Clean() (int64, bool) {
 	path, err := p.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }

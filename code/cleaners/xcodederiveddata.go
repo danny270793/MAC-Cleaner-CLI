@@ -30,12 +30,13 @@ func (x XcodeDerivedData) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (x XcodeDerivedData) Clean() {
+func (x XcodeDerivedData) Clean() (int64, bool) {
 	path, err := x.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }

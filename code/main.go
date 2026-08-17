@@ -121,12 +121,15 @@ func main() {
 			continue
 		}
 
+		cleaned, cleanedMeasurable := size, measurable
 		if !*dryRun {
-			cleaner.Clean()
+			if actual, ok := cleaner.Clean(); ok {
+				cleaned, cleanedMeasurable = actual, true
+			}
 		}
 		printDone(cleaner.Name())
-		if measurable {
-			total += size
+		if cleanedMeasurable {
+			total += cleaned
 			totalMeasurable = true
 		}
 	}
