@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.4.0...v0.5.0) (2026-08-17)
+
+
+### Features
+
+* **docker:** force prune, remove more, and measure reclaimed space ([8899e80](https://github.com/danny270793/MAC-Cleaner-CLI/commit/8899e80bdb2d102480f9cd9613057571b7b6ee4f))
+* **main:** use cleaner-reported size when available for total ([3ebe647](https://github.com/danny270793/MAC-Cleaner-CLI/commit/3ebe647bb931c671d83384540fbcf81ceb143de8))
+
 ## [0.4.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.3.1...v0.4.0) (2026-08-09)
 
 
