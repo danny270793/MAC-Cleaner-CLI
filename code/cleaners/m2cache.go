@@ -30,12 +30,13 @@ func (m M2Cache) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (m M2Cache) Clean() {
+func (m M2Cache) Clean() (int64, bool) {
 	path, err := m.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }
