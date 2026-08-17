@@ -33,14 +33,16 @@ func (c CargoCache) Size() (int64, bool) {
 	return sizeOfPaths(paths...)
 }
 
-func (c CargoCache) Clean() {
+func (c CargoCache) Clean() (int64, bool) {
 	paths, err := c.paths()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	for _, path := range paths {
 		removeContents(path)
 	}
+
+	return 0, false
 }
