@@ -30,12 +30,13 @@ func (n NpmCache) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (n NpmCache) Clean() {
+func (n NpmCache) Clean() (int64, bool) {
 	path, err := n.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	removeContents(path)
+	return 0, false
 }
