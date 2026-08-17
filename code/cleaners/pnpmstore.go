@@ -31,10 +31,10 @@ func (p PnpmStore) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (PnpmStore) Clean() {
+func (PnpmStore) Clean() (int64, bool) {
 	if _, err := exec.LookPath("pnpm"); err != nil {
 		fmt.Println("pnpm not installed (nothing to clean)")
-		return
+		return 0, false
 	}
 
 	cmd := exec.Command("pnpm", "store", "prune")
@@ -45,4 +45,6 @@ func (PnpmStore) Clean() {
 	if err := cmd.Run(); err != nil {
 		fmt.Println("failed to run pnpm store prune:", err)
 	}
+
+	return 0, false
 }
