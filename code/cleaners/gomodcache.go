@@ -31,10 +31,10 @@ func (g GoModCache) Size() (int64, bool) {
 	return dirSize(path)
 }
 
-func (GoModCache) Clean() {
+func (GoModCache) Clean() (int64, bool) {
 	if _, err := exec.LookPath("go"); err != nil {
 		fmt.Println("go not installed (nothing to clean)")
-		return
+		return 0, false
 	}
 
 	cmd := exec.Command("go", "clean", "-modcache")
@@ -45,4 +45,6 @@ func (GoModCache) Clean() {
 	if err := cmd.Run(); err != nil {
 		fmt.Println("failed to run go clean -modcache:", err)
 	}
+
+	return 0, false
 }
