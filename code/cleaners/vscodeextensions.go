@@ -126,26 +126,26 @@ func (v VSCodeExtensions) Size() (int64, bool) {
 	return total, true
 }
 
-func (v VSCodeExtensions) Clean() {
+func (v VSCodeExtensions) Clean() (int64, bool) {
 	root, err := v.path()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	stale, err := staleExtensionDirs(root)
 	if err != nil {
 		if os.IsNotExist(err) {
 			fmt.Printf("%s not found (nothing to clean)\n", root)
-			return
+			return 0, false
 		}
 		fmt.Printf("failed to read %s: %v\n", root, err)
-		return
+		return 0, false
 	}
 
 	if len(stale) == 0 {
 		fmt.Println("no outdated vscode extensions found")
-		return
+		return 0, false
 	}
 
 	for _, name := range stale {
@@ -156,4 +156,6 @@ func (v VSCodeExtensions) Clean() {
 		}
 		fmt.Printf("removed %s\n", path)
 	}
+
+	return 0, false
 }
