@@ -33,14 +33,16 @@ func (g Gradle) Size() (int64, bool) {
 	return sizeOfPaths(paths...)
 }
 
-func (g Gradle) Clean() {
+func (g Gradle) Clean() (int64, bool) {
 	paths, err := g.paths()
 	if err != nil {
 		fmt.Println("failed to resolve home directory:", err)
-		return
+		return 0, false
 	}
 
 	for _, path := range paths {
 		removeContents(path)
 	}
+
+	return 0, false
 }
