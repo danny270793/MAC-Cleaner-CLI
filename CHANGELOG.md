@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.5.0...v0.6.0) (2026-09-07)
+
+
+### Features
+
+* **cleaners:** add dart server and vaadin cache cleaners ([2d2e099](https://github.com/danny270793/MAC-Cleaner-CLI/commit/2d2e09976925b856d61a97afb4ebf7190268449d))
+* **cleaners:** add git-clean cleaner for build folders in git repos ([6943e45](https://github.com/danny270793/MAC-Cleaner-CLI/commit/6943e45f3c950949a75c21a6fcc3134b29fcb61c))
+* wire git-clean, dart-server-cache, and vaadin-cache into the CLI ([bed992a](https://github.com/danny270793/MAC-Cleaner-CLI/commit/bed992ac238486f220780a6ace95408325ba90ab))
+
 ## [0.5.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.4.0...v0.5.0) (2026-08-17)
 
 
