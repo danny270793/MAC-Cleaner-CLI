@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"danny270793/maccleaner/code/cleaners"
 )
@@ -22,11 +23,14 @@ func main() {
 		fmt.Fprintln(output, "  maccleaner --docker --gradle")
 		fmt.Fprintln(output, "  maccleaner --all --dry-run")
 		fmt.Fprintln(output, "  maccleaner --all --auto-approve")
+		fmt.Fprintln(output, "  maccleaner --git-clean --gitpath=/Users/you/Github,/Users/you/Gitlab")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
 	all := flag.Bool("all", false, "run every cleaner")
 	docker := flag.Bool("docker", false, "clean docker")
+	gitClean := flag.Bool("git-clean", false, "remove build/dependency folders (node_modules, build, .gradle, ...) found inside git repos under --gitpath")
+	gitPath := flag.String("gitpath", "", "comma-separated root paths to scan for git repos, used with --git-clean or --all")
 	gradle := flag.Bool("gradle", false, "clean gradle caches")
 	libraryCaches := flag.Bool("library-caches", false, "clean ~/Library/Caches")
 	pubCache := flag.Bool("pub-cache", false, "clean ~/.pub-cache")
@@ -38,6 +42,8 @@ func main() {
 	npmCache := flag.Bool("npm-cache", false, "clean ~/.npm")
 	m2Cache := flag.Bool("m2-cache", false, "clean ~/.m2/repository")
 	pnpmStore := flag.Bool("pnpm-store", false, "prune the pnpm store (pnpm store prune)")
+	dartServerCache := flag.Bool("dart-server-cache", false, "clean ~/.dartServer")
+	vaadinCache := flag.Bool("vaadin-cache", false, "clean ~/.vaadin")
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
 	flag.Parse()
@@ -46,6 +52,8 @@ func main() {
 		fmt.Println(version)
 		return
 	}
+
+	gitPaths := parseGitPaths(*gitPath)
 
 	var selected []Cleaner
 	if *all {
@@ -62,6 +70,9 @@ func main() {
 			cleaners.PnpmStore{},
 			cleaners.M2Cache{},
 			cleaners.Docker{},
+			cleaners.GitClean{Paths: gitPaths},
+			cleaners.DartServerCache{},
+			cleaners.VaadinCache{},
 		}
 	} else {
 		if *gradle {
@@ -100,10 +111,19 @@ func main() {
 		if *docker {
 			selected = append(selected, cleaners.Docker{})
 		}
+		if *gitClean {
+			selected = append(selected, cleaners.GitClean{Paths: gitPaths})
+		}
+		if *dartServerCache {
+			selected = append(selected, cleaners.DartServerCache{})
+		}
+		if *vaadinCache {
+			selected = append(selected, cleaners.VaadinCache{})
+		}
 	}
 
 	if len(selected) == 0 {
-		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache --vscode-extensions --xcode-derived-data --core-simulator-caches --go-mod-cache --cargo-cache --npm-cache --pnpm-store --m2-cache")
+		fmt.Println("no cleaner selected, pass --all or one of --docker --gradle --library-caches --pub-cache --vscode-extensions --xcode-derived-data --core-simulator-caches --go-mod-cache --cargo-cache --npm-cache --pnpm-store --m2-cache --git-clean --dart-server-cache --vaadin-cache")
 		flag.Usage()
 		return
 	}
@@ -134,4 +154,15 @@ func main() {
 		}
 	}
 	printTotal(total, totalMeasurable)
+}
+
+func parseGitPaths(value string) []string {
+	var paths []string
+	for _, part := range strings.Split(value, ",") {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			paths = append(paths, trimmed)
+		}
+	}
+
+	return paths
 }
