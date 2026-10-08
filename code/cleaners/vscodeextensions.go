@@ -159,3 +159,24 @@ func (v VSCodeExtensions) Clean() (int64, bool) {
 
 	return 0, false
 }
+
+func (v VSCodeExtensions) Commands() []string {
+	root, err := v.path()
+	if err != nil {
+		return nil
+	}
+
+	stale, err := staleExtensionDirs(root)
+	if err != nil {
+		return nil
+	}
+
+	sort.Strings(stale)
+
+	var commands []string
+	for _, name := range stale {
+		commands = append(commands, removeCommand(filepath.Join(root, name)))
+	}
+
+	return commands
+}

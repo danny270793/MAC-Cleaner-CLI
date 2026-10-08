@@ -40,3 +40,12 @@ func (x XcodeDerivedData) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (x XcodeDerivedData) Commands() []string {
+	path, err := x.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

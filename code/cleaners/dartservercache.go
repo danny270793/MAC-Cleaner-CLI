@@ -40,3 +40,12 @@ func (d DartServerCache) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (d DartServerCache) Commands() []string {
+	path, err := d.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

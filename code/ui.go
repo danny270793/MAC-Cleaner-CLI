@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
+	"time"
 )
 
 const (
@@ -22,7 +23,17 @@ func printPending(name string, size int64, measurable bool) {
 	fmt.Printf("%s%s[ ] cleaning %s%s\n", colorBold, colorCyan, name, colorReset)
 }
 
-func printDone(name string) {
+func printCommands(commands []string) {
+	for _, command := range commands {
+		fmt.Printf("    $ %s\n", command)
+	}
+}
+
+func printDone(name string, elapsed time.Duration, timed bool) {
+	if timed {
+		fmt.Printf("%s%s[x] cleaned %s (%s)%s\n\n", colorBold, colorGreen, name, formatDuration(elapsed), colorReset)
+		return
+	}
 	fmt.Printf("%s%s[x] cleaned %s%s\n\n", colorBold, colorGreen, name, colorReset)
 }
 
@@ -57,4 +68,22 @@ func formatBytes(bytes int64) string {
 	}
 
 	return fmt.Sprintf("%.1f%cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+}
+
+// formatDuration renders d compactly, e.g. "850ms", "12s", "1m 25s", "1h 2m 5s".
+func formatDuration(d time.Duration) string {
+	if d < time.Second {
+		return fmt.Sprintf("%dms", d.Milliseconds())
+	}
+
+	d = d.Round(time.Second)
+	hours, minutes, seconds := int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60
+	switch {
+	case hours > 0:
+		return fmt.Sprintf("%dh %dm %ds", hours, minutes, seconds)
+	case minutes > 0:
+		return fmt.Sprintf("%dm %ds", minutes, seconds)
+	default:
+		return fmt.Sprintf("%ds", seconds)
+	}
 }

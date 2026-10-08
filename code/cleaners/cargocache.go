@@ -46,3 +46,12 @@ func (c CargoCache) Clean() (int64, bool) {
 
 	return 0, false
 }
+
+func (c CargoCache) Commands() []string {
+	paths, err := c.paths()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(paths...)
+}

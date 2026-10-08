@@ -108,3 +108,28 @@ func TestRemoveContentsKeepsFolder(t *testing.T) {
 func TestRemoveContentsMissingDoesNotPanic(t *testing.T) {
 	removeContents(filepath.Join(t.TempDir(), "missing"))
 }
+
+func TestShellQuote(t *testing.T) {
+	cases := map[string]string{
+		"/Users/me/repo/node_modules": "/Users/me/repo/node_modules",
+		"/Users/me/My Repo/build":     "'/Users/me/My Repo/build'",
+		"/tmp/it's":                   `'/tmp/it'\''s'`,
+	}
+	for in, want := range cases {
+		if got := shellQuote(in); got != want {
+			t.Errorf("shellQuote(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestRemoveContentsCommandsSkipsMissingPaths(t *testing.T) {
+	dir := t.TempDir()
+
+	commands := removeContentsCommands(dir, filepath.Join(dir, "missing"))
+	if len(commands) != 1 {
+		t.Fatalf("expected 1 command, got %v", commands)
+	}
+	if want := "find " + dir + " -mindepth 1 -maxdepth 1 -exec rm -rf {} +"; commands[0] != want {
+		t.Fatalf("got %q, want %q", commands[0], want)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"danny270793/maccleaner/code/cleaners"
 )
@@ -23,13 +24,14 @@ func main() {
 		fmt.Fprintln(output, "  maccleaner --docker --gradle")
 		fmt.Fprintln(output, "  maccleaner --all --dry-run")
 		fmt.Fprintln(output, "  maccleaner --all --auto-approve")
+		fmt.Fprintln(output, "  maccleaner --all --dry-run --verbose")
 		fmt.Fprintln(output, "  maccleaner --git-clean --gitpath=/Users/you/Github,/Users/you/Gitlab")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
 	all := flag.Bool("all", false, "run every cleaner")
 	docker := flag.Bool("docker", false, "clean docker")
-	gitClean := flag.Bool("git-clean", false, "remove build/dependency folders (node_modules, build, .gradle, ...) found inside git repos under --gitpath")
+	gitClean := flag.Bool("git-clean", false, "remove git-ignored build/dependency folders (node_modules, build, .gradle, ...) found inside git repos under --gitpath")
 	gitPath := flag.String("gitpath", "", "comma-separated root paths to scan for git repos, used with --git-clean or --all")
 	gradle := flag.Bool("gradle", false, "clean gradle caches")
 	libraryCaches := flag.Bool("library-caches", false, "clean ~/Library/Caches")
@@ -46,6 +48,7 @@ func main() {
 	vaadinCache := flag.Bool("vaadin-cache", false, "clean ~/.vaadin")
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
+	verbose := flag.Bool("verbose", false, "show the commands each cleaner will execute before running it")
 	flag.Parse()
 
 	if *showVersion {
@@ -70,7 +73,7 @@ func main() {
 			cleaners.PnpmStore{},
 			cleaners.M2Cache{},
 			cleaners.Docker{},
-			cleaners.GitClean{Paths: gitPaths},
+			&cleaners.GitClean{Paths: gitPaths},
 			cleaners.DartServerCache{},
 			cleaners.VaadinCache{},
 		}
@@ -112,7 +115,7 @@ func main() {
 			selected = append(selected, cleaners.Docker{})
 		}
 		if *gitClean {
-			selected = append(selected, cleaners.GitClean{Paths: gitPaths})
+			selected = append(selected, &cleaners.GitClean{Paths: gitPaths})
 		}
 		if *dartServerCache {
 			selected = append(selected, cleaners.DartServerCache{})
@@ -135,6 +138,9 @@ func main() {
 	for _, cleaner := range selected {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
+		if *verbose {
+			printCommands(cleaner.Commands())
+		}
 
 		if !*dryRun && !*autoApprove && !confirm(reader, cleaner.Name()) {
 			printSkipped(cleaner.Name())
@@ -142,12 +148,15 @@ func main() {
 		}
 
 		cleaned, cleanedMeasurable := size, measurable
+		var elapsed time.Duration
 		if !*dryRun {
+			start := time.Now()
 			if actual, ok := cleaner.Clean(); ok {
 				cleaned, cleanedMeasurable = actual, true
 			}
+			elapsed = time.Since(start)
 		}
-		printDone(cleaner.Name())
+		printDone(cleaner.Name(), elapsed, !*dryRun)
 		if cleanedMeasurable {
 			total += cleaned
 			totalMeasurable = true

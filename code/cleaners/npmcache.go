@@ -40,3 +40,12 @@ func (n NpmCache) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (n NpmCache) Commands() []string {
+	path, err := n.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

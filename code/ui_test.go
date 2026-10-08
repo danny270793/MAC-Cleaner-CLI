@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestFormatBytes(t *testing.T) {
 	cases := []struct {
@@ -18,6 +21,25 @@ func TestFormatBytes(t *testing.T) {
 	for _, c := range cases {
 		if got := formatBytes(c.in); got != c.want {
 			t.Errorf("formatBytes(%d) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestFormatDuration(t *testing.T) {
+	cases := []struct {
+		in   time.Duration
+		want string
+	}{
+		{0, "0ms"},
+		{850 * time.Millisecond, "850ms"},
+		{12 * time.Second, "12s"},
+		{12400 * time.Millisecond, "12s"},
+		{85 * time.Second, "1m 25s"},
+		{time.Hour + 2*time.Minute + 5*time.Second, "1h 2m 5s"},
+	}
+	for _, c := range cases {
+		if got := formatDuration(c.in); got != c.want {
+			t.Errorf("formatDuration(%v) = %q, want %q", c.in, got, c.want)
 		}
 	}
 }

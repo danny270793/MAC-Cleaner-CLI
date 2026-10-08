@@ -40,3 +40,12 @@ func (p PubCache) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (p PubCache) Commands() []string {
+	path, err := p.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

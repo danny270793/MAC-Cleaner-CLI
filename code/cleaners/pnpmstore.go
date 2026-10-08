@@ -48,3 +48,11 @@ func (PnpmStore) Clean() (int64, bool) {
 
 	return 0, false
 }
+
+func (PnpmStore) Commands() []string {
+	if _, err := exec.LookPath("pnpm"); err != nil {
+		return nil
+	}
+
+	return []string{"pnpm store prune"}
+}

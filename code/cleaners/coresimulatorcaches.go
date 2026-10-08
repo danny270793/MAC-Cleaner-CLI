@@ -40,3 +40,12 @@ func (c CoreSimulatorCaches) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (c CoreSimulatorCaches) Commands() []string {
+	path, err := c.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}
