@@ -4,14 +4,21 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
 // GitClean scans one or more root directories for git repositories and
-// removes common build/dependency folders found inside each one.
+// removes common build/dependency folders found inside each one, but only
+// those that git itself reports as ignored (via .gitignore, .git/info/exclude
+// or the global excludes file) and that contain no tracked files.
 type GitClean struct {
 	Paths []string
+
+	scanned bool
+	junk    []string
 }
 
 func (GitClean) Name() string {
@@ -65,30 +72,96 @@ func (g GitClean) findRepos() []string {
 	return repos
 }
 
-// junkPaths walks each discovered repo and collects the paths matching
-// gitCleanTargets, without descending into a match or into ".git".
-func (g GitClean) junkPaths() []string {
-	var junk []string
-	for _, repo := range g.findRepos() {
-		filepath.WalkDir(repo, func(path string, d fs.DirEntry, err error) error {
-			if err != nil || !d.IsDir() {
-				return nil
-			}
-			if path != repo && d.Name() == ".git" {
-				return filepath.SkipDir
-			}
-			if isGitCleanTarget(d.Name()) {
-				junk = append(junk, path)
-				return filepath.SkipDir
-			}
-			return nil
-		})
+// ignoredDirs asks git, in a single call, for the directories under repo that
+// are ignored and contain no tracked files (a directory holding a tracked
+// file is reported file by file instead). Any git failure yields no dirs.
+func ignoredDirs(repo string) []string {
+	output, err := exec.Command("git", "-C", repo, "ls-files", "-z", "--others", "--ignored", "--exclude-standard", "--directory").Output()
+	if err != nil {
+		return nil
 	}
 
-	return junk
+	var dirs []string
+	for _, entry := range strings.Split(string(output), "\x00") {
+		if strings.HasSuffix(entry, "/") {
+			dirs = append(dirs, filepath.Join(repo, filepath.FromSlash(strings.TrimSuffix(entry, "/"))))
+		}
+	}
+
+	return dirs
 }
 
-func (g GitClean) Size() (int64, bool) {
+// junkPaths returns the paths matching gitCleanTargets that git ignores and
+// that hold no tracked files. It scans once and reuses the result, since
+// Size, Commands and Clean all need it and git is slow to start.
+func (g *GitClean) junkPaths() []string {
+	if g.scanned {
+		return g.junk
+	}
+
+	g.scanned = true
+	g.junk = nil
+	if _, err := exec.LookPath("git"); err != nil {
+		return g.junk
+	}
+
+	seen := make(map[string]bool)
+	for _, repo := range g.findRepos() {
+		for _, dir := range ignoredDirs(repo) {
+			for _, target := range targetsWithin(dir) {
+				if !seen[target] {
+					seen[target] = true
+					g.junk = append(g.junk, target)
+				}
+			}
+		}
+	}
+	g.junk = dropNested(g.junk)
+
+	return g.junk
+}
+
+// dropNested removes paths that sit inside another path of the list, so a
+// folder is never counted or deleted twice.
+func dropNested(paths []string) []string {
+	sort.Strings(paths)
+
+	var kept []string
+	for _, path := range paths {
+		if len(kept) > 0 && strings.HasPrefix(path, kept[len(kept)-1]+string(filepath.Separator)) {
+			continue
+		}
+		kept = append(kept, path)
+	}
+
+	return kept
+}
+
+// targetsWithin returns dir itself if it is a gitCleanTargets match, else the
+// matches nested inside it. dir is wholly ignored with nothing tracked, so
+// everything under it is safe too; git reports it as one entry, hiding e.g.
+// an "out/node_modules".
+func targetsWithin(dir string) []string {
+	if isGitCleanTarget(filepath.Base(dir)) {
+		return []string{dir}
+	}
+
+	var found []string
+	filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || !d.IsDir() || path == dir {
+			return nil
+		}
+		if isGitCleanTarget(d.Name()) {
+			found = append(found, path)
+			return filepath.SkipDir
+		}
+		return nil
+	})
+
+	return found
+}
+
+func (g *GitClean) Size() (int64, bool) {
 	if len(g.Paths) == 0 {
 		return 0, false
 	}
@@ -96,7 +169,7 @@ func (g GitClean) Size() (int64, bool) {
 	return sizeOfPaths(g.junkPaths()...)
 }
 
-func (g GitClean) Clean() (int64, bool) {
+func (g *GitClean) Clean() (int64, bool) {
 	if len(g.Paths) == 0 {
 		fmt.Println("no --gitpath provided (nothing to clean)")
 		return 0, false
@@ -104,7 +177,7 @@ func (g GitClean) Clean() (int64, bool) {
 
 	paths := g.junkPaths()
 	if len(paths) == 0 {
-		fmt.Println("no matching build folders found under the given --gitpath (nothing to clean)")
+		fmt.Println("no git-ignored build folders found under the given --gitpath (nothing to clean)")
 		return 0, false
 	}
 
@@ -118,6 +191,9 @@ func (g GitClean) Clean() (int64, bool) {
 		fmt.Printf("cleaned %s\n", path)
 		total += size
 	}
+
+	// What was scanned is gone now, so a later call must look again.
+	g.scanned = false
 
 	return total, true
 }

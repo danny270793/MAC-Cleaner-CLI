@@ -2,20 +2,40 @@ package cleaners
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 )
+
+// initRepo creates a real git repo at dir with the given .gitignore content.
+func initRepo(t *testing.T, dir, gitignore string) {
+	t.Helper()
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatalf("failed to create %s: %v", dir, err)
+	}
+	if out, err := exec.Command("git", "-C", dir, "init", "-q").CombinedOutput(); err != nil {
+		t.Fatalf("git init failed: %v: %s", err, out)
+	}
+	if gitignore != "" {
+		if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte(gitignore), 0o644); err != nil {
+			t.Fatalf("failed to write .gitignore: %v", err)
+		}
+	}
+}
 
 func TestGitCleanFindsAndRemovesJunkFolders(t *testing.T) {
 	root := t.TempDir()
 
 	repoA := filepath.Join(root, "org", "repo-a")
-	writeFile(t, filepath.Join(repoA, ".git", "HEAD"), 10)
+	initRepo(t, repoA, "node_modules/\n")
 	writeFile(t, filepath.Join(repoA, "node_modules", "left-pad", "index.js"), 100)
 	writeFile(t, filepath.Join(repoA, "src", "main.go"), 20)
 
 	repoB := filepath.Join(root, "org", "repo-b")
-	writeFile(t, filepath.Join(repoB, ".git", "HEAD"), 10)
+	initRepo(t, repoB, "build/\n.gradle/\n")
 	writeFile(t, filepath.Join(repoB, "build", "output.apk"), 200)
 	writeFile(t, filepath.Join(repoB, "app", ".gradle", "cache.bin"), 50)
 
@@ -78,7 +98,7 @@ func TestGitCleanNameAndNoPaths(t *testing.T) {
 func TestGitCleanNoMatches(t *testing.T) {
 	root := t.TempDir()
 	repo := filepath.Join(root, "repo")
-	writeFile(t, filepath.Join(repo, ".git", "HEAD"), 10)
+	initRepo(t, repo, "")
 	writeFile(t, filepath.Join(repo, "src", "main.go"), 20)
 
 	gitClean := GitClean{Paths: []string{root}}

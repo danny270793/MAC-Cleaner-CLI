@@ -29,7 +29,7 @@ func main() {
 	showVersion := flag.Bool("version", false, "print the version and exit")
 	all := flag.Bool("all", false, "run every cleaner")
 	docker := flag.Bool("docker", false, "clean docker")
-	gitClean := flag.Bool("git-clean", false, "remove build/dependency folders (node_modules, build, .gradle, ...) found inside git repos under --gitpath")
+	gitClean := flag.Bool("git-clean", false, "remove git-ignored build/dependency folders (node_modules, build, .gradle, ...) found inside git repos under --gitpath")
 	gitPath := flag.String("gitpath", "", "comma-separated root paths to scan for git repos, used with --git-clean or --all")
 	gradle := flag.Bool("gradle", false, "clean gradle caches")
 	libraryCaches := flag.Bool("library-caches", false, "clean ~/Library/Caches")
@@ -70,7 +70,7 @@ func main() {
 			cleaners.PnpmStore{},
 			cleaners.M2Cache{},
 			cleaners.Docker{},
-			cleaners.GitClean{Paths: gitPaths},
+			&cleaners.GitClean{Paths: gitPaths},
 			cleaners.DartServerCache{},
 			cleaners.VaadinCache{},
 		}
@@ -112,7 +112,7 @@ func main() {
 			selected = append(selected, cleaners.Docker{})
 		}
 		if *gitClean {
-			selected = append(selected, cleaners.GitClean{Paths: gitPaths})
+			selected = append(selected, &cleaners.GitClean{Paths: gitPaths})
 		}
 		if *dartServerCache {
 			selected = append(selected, cleaners.DartServerCache{})
