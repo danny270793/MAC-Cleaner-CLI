@@ -46,3 +46,12 @@ func (g Gradle) Clean() (int64, bool) {
 
 	return 0, false
 }
+
+func (g Gradle) Commands() []string {
+	paths, err := g.paths()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(paths...)
+}

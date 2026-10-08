@@ -96,3 +96,11 @@ func parseHumanSize(s string) (int64, bool) {
 
 	return 0, false
 }
+
+func (Docker) Commands() []string {
+	if _, err := exec.LookPath("docker"); err != nil {
+		return nil
+	}
+
+	return []string{"docker system prune --all --volumes --force"}
+}

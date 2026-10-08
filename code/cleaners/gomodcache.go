@@ -48,3 +48,11 @@ func (GoModCache) Clean() (int64, bool) {
 
 	return 0, false
 }
+
+func (GoModCache) Commands() []string {
+	if _, err := exec.LookPath("go"); err != nil {
+		return nil
+	}
+
+	return []string{"go clean -modcache"}
+}

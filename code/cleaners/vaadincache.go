@@ -40,3 +40,12 @@ func (v VaadinCache) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (v VaadinCache) Commands() []string {
+	path, err := v.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

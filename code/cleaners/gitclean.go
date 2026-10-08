@@ -197,3 +197,19 @@ func (g *GitClean) Clean() (int64, bool) {
 
 	return total, true
 }
+
+// Commands lists the removals Clean would perform. The read-only git checks
+// used to decide what is ignored (git check-ignore, git ls-files) are not
+// listed.
+func (g *GitClean) Commands() []string {
+	if len(g.Paths) == 0 {
+		return nil
+	}
+
+	var commands []string
+	for _, path := range g.junkPaths() {
+		commands = append(commands, removeCommand(path))
+	}
+
+	return commands
+}

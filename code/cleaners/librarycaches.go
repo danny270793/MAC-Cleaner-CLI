@@ -40,3 +40,12 @@ func (l LibraryCaches) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (l LibraryCaches) Commands() []string {
+	path, err := l.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

@@ -113,3 +113,94 @@ func TestGitCleanNoMatches(t *testing.T) {
 		t.Fatalf("expected ok=false, got cleaned=%d", cleaned)
 	}
 }
+
+func TestGitCleanSkipsFoldersNotIgnored(t *testing.T) {
+	root := t.TempDir()
+	repo := filepath.Join(root, "repo")
+	initRepo(t, repo, "node_modules/\n")
+	writeFile(t, filepath.Join(repo, "node_modules", "pkg", "index.js"), 100)
+	writeFile(t, filepath.Join(repo, "dist", "bundle.js"), 200)
+	writeFile(t, filepath.Join(repo, "dist", "nested", "node_modules", "x.js"), 30)
+
+	gitClean := GitClean{Paths: []string{root}}
+
+	// dist is not ignored so it must stay, but the ignored node_modules
+	// nested inside it is still regenerable.
+	size, ok := gitClean.Size()
+	if !ok || size != 130 {
+		t.Fatalf("expected size 130, got %d (ok=%v)", size, ok)
+	}
+
+	if _, ok := gitClean.Clean(); !ok {
+		t.Fatalf("expected Clean to report ok=true")
+	}
+
+	if _, err := os.Stat(filepath.Join(repo, "dist", "bundle.js")); err != nil {
+		t.Fatalf("expected non-ignored dist to survive: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(repo, "node_modules")); !os.IsNotExist(err) {
+		t.Fatalf("expected ignored node_modules to be removed, err=%v", err)
+	}
+	if _, err := os.Stat(filepath.Join(repo, "dist", "nested", "node_modules")); !os.IsNotExist(err) {
+		t.Fatalf("expected nested ignored node_modules to be removed, err=%v", err)
+	}
+}
+
+func TestGitCleanSkipsFoldersWithTrackedFiles(t *testing.T) {
+	root := t.TempDir()
+	repo := filepath.Join(root, "repo")
+	initRepo(t, repo, "dist/\n")
+	writeFile(t, filepath.Join(repo, "dist", "committed.js"), 100)
+
+	// Force-add a file inside an ignored folder so it is tracked.
+	if out, err := exec.Command("git", "-C", repo, "add", "-f", "dist/committed.js").CombinedOutput(); err != nil {
+		t.Fatalf("git add failed: %v: %s", err, out)
+	}
+
+	gitClean := GitClean{Paths: []string{root}}
+
+	if size, ok := gitClean.Size(); ok {
+		t.Fatalf("expected ok=false, got size=%d", size)
+	}
+	if _, ok := gitClean.Clean(); ok {
+		t.Fatalf("expected Clean to report ok=false")
+	}
+	if _, err := os.Stat(filepath.Join(repo, "dist", "committed.js")); err != nil {
+		t.Fatalf("expected tracked file to survive: %v", err)
+	}
+}
+
+func TestGitCleanCommands(t *testing.T) {
+	if cmds := (&GitClean{}).Commands(); len(cmds) != 0 {
+		t.Fatalf("expected no commands without paths, got %v", cmds)
+	}
+
+	root := t.TempDir()
+	repo := filepath.Join(root, "repo")
+	initRepo(t, repo, "node_modules/\n")
+	writeFile(t, filepath.Join(repo, "node_modules", "pkg", "index.js"), 100)
+	writeFile(t, filepath.Join(repo, "dist", "bundle.js"), 200)
+
+	gitClean := GitClean{Paths: []string{root}}
+	cmds := gitClean.Commands()
+	want := "rm -rf " + shellQuote(filepath.Join(repo, "node_modules"))
+	if len(cmds) != 1 || cmds[0] != want {
+		t.Fatalf("expected [%q], got %v", want, cmds)
+	}
+}
+
+func TestGitCleanFindsTargetsInsideIgnoredFolders(t *testing.T) {
+	root := t.TempDir()
+	repo := filepath.Join(root, "repo")
+	initRepo(t, repo, "out/\n*.log\n")
+	writeFile(t, filepath.Join(repo, "out", "web", "node_modules", "x.js"), 40)
+	writeFile(t, filepath.Join(repo, "out", "keep.txt"), 5)
+
+	gitClean := GitClean{Paths: []string{root}}
+
+	cmds := gitClean.Commands()
+	want := "rm -rf " + shellQuote(filepath.Join(repo, "out", "web", "node_modules"))
+	if len(cmds) != 1 || cmds[0] != want {
+		t.Fatalf("expected [%q], got %v", want, cmds)
+	}
+}

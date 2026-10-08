@@ -24,6 +24,7 @@ func main() {
 		fmt.Fprintln(output, "  maccleaner --all --dry-run")
 		fmt.Fprintln(output, "  maccleaner --all --auto-approve")
 		fmt.Fprintln(output, "  maccleaner --git-clean --gitpath=/Users/you/Github,/Users/you/Gitlab")
+		fmt.Fprintln(output, "  maccleaner --all --dry-run --verbose")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
@@ -47,6 +48,7 @@ func main() {
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
 	flag.Parse()
+	verbose := flag.Bool("verbose", false, "show the commands each cleaner will execute before running it")
 
 	if *showVersion {
 		fmt.Println(version)
@@ -136,6 +138,9 @@ func main() {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
 
+		if *verbose {
+			printCommands(cleaner.Commands())
+		}
 		if !*dryRun && !*autoApprove && !confirm(reader, cleaner.Name()) {
 			printSkipped(cleaner.Name())
 			continue

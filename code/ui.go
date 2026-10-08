@@ -22,6 +22,12 @@ func printPending(name string, size int64, measurable bool) {
 	fmt.Printf("%s%s[ ] cleaning %s%s\n", colorBold, colorCyan, name, colorReset)
 }
 
+func printCommands(commands []string) {
+	for _, command := range commands {
+		fmt.Printf("    $ %s\n", command)
+	}
+}
+
 func printDone(name string) {
 	fmt.Printf("%s%s[x] cleaned %s%s\n\n", colorBold, colorGreen, name, colorReset)
 }

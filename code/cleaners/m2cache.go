@@ -40,3 +40,12 @@ func (m M2Cache) Clean() (int64, bool) {
 	removeContents(path)
 	return 0, false
 }
+
+func (m M2Cache) Commands() []string {
+	path, err := m.path()
+	if err != nil {
+		return nil
+	}
+
+	return removeContentsCommands(path)
+}

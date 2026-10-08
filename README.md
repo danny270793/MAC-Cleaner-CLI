@@ -70,6 +70,7 @@ Or build a binary first:
 | `--gitpath`               | Comma-separated root paths to scan for git repos, used with `--git-clean` or `--all` |
 | `--dry-run`               | Show what would be cleaned (with sizes) without actually cleaning anything  |
 | `--auto-approve`          | Skip the confirmation prompt shown before each cleaner                      |
+| `--verbose`               | Print the commands each cleaner will execute before its confirmation prompt |
 | `--version`               | Print the version and exit                                                   |
 | `--help`                  | Show usage and exit                                                          |
 
