@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"danny270793/maccleaner/code/cleaners"
 )
@@ -23,8 +24,8 @@ func main() {
 		fmt.Fprintln(output, "  maccleaner --docker --gradle")
 		fmt.Fprintln(output, "  maccleaner --all --dry-run")
 		fmt.Fprintln(output, "  maccleaner --all --auto-approve")
-		fmt.Fprintln(output, "  maccleaner --git-clean --gitpath=/Users/you/Github,/Users/you/Gitlab")
 		fmt.Fprintln(output, "  maccleaner --all --dry-run --verbose")
+		fmt.Fprintln(output, "  maccleaner --git-clean --gitpath=/Users/you/Github,/Users/you/Gitlab")
 	}
 
 	showVersion := flag.Bool("version", false, "print the version and exit")
@@ -47,8 +48,8 @@ func main() {
 	vaadinCache := flag.Bool("vaadin-cache", false, "clean ~/.vaadin")
 	dryRun := flag.Bool("dry-run", false, "show what would be cleaned without actually cleaning it")
 	autoApprove := flag.Bool("auto-approve", false, "skip the confirmation prompt before each cleaner")
-	flag.Parse()
 	verbose := flag.Bool("verbose", false, "show the commands each cleaner will execute before running it")
+	flag.Parse()
 
 	if *showVersion {
 		fmt.Println(version)
@@ -137,22 +138,25 @@ func main() {
 	for _, cleaner := range selected {
 		size, measurable := cleaner.Size()
 		printPending(cleaner.Name(), size, measurable)
-
 		if *verbose {
 			printCommands(cleaner.Commands())
 		}
+
 		if !*dryRun && !*autoApprove && !confirm(reader, cleaner.Name()) {
 			printSkipped(cleaner.Name())
 			continue
 		}
 
 		cleaned, cleanedMeasurable := size, measurable
+		var elapsed time.Duration
 		if !*dryRun {
+			start := time.Now()
 			if actual, ok := cleaner.Clean(); ok {
 				cleaned, cleanedMeasurable = actual, true
 			}
+			elapsed = time.Since(start)
 		}
-		printDone(cleaner.Name())
+		printDone(cleaner.Name(), elapsed, !*dryRun)
 		if cleanedMeasurable {
 			total += cleaned
 			totalMeasurable = true
