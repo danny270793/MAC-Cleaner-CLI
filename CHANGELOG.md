@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.6.0...v0.7.0) (2026-10-08)
+
+
+### Features
+
+* add --verbose flag to show commands before each cleaner runs ([bc22507](https://github.com/danny270793/MAC-Cleaner-CLI/commit/bc22507b61890fab7984b39e6730f0b6274009fa))
+* git-clean only removes git-ignored folders, add --verbose and timing ([e94c691](https://github.com/danny270793/MAC-Cleaner-CLI/commit/e94c69133ac7e7b57fc82cd0dd56c909a746b83a))
+* **git-clean:** only remove folders that git ignores ([73bd734](https://github.com/danny270793/MAC-Cleaner-CLI/commit/73bd7349d678dd57efc8fc10609da7aab0646c44))
+* show how long each cleaner took ([a075f8b](https://github.com/danny270793/MAC-Cleaner-CLI/commit/a075f8bce65f024d3fb87ef838f7963bedc0f0d0))
+
 ## [0.6.0](https://github.com/danny270793/MAC-Cleaner-CLI/compare/v0.5.0...v0.6.0) (2026-09-07)
 
 
